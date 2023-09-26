@@ -1,7 +1,7 @@
 # SI 206 HW4
-# Your name:
-# Your student id:
-# Your email:
+# Your name: Ava Stravato
+# Your student id: 22951813
+# Your email: astravat@umich.edu
 # Who you worked with on this homework:
 
 import unittest
@@ -29,12 +29,23 @@ class Customer:
            If they do not have enough money then print "Insufficient funds"
            and return False.
         3) Call the process_order method on the vendor object. If process_order
-           returns True remove the total cost from the customer’s wallet and
+           returns True remove the total cost from the customers wallet and
            add it to the vendor's earnings and return True.
            Otherwise, return False.
         '''
+        vendor = Vendor() # create instance of vendor class
+        total_cost = vendor.calculate_cost() # funx might need parameters as defined below, unsure
+        avail_funds = self.wallet
+        if (total_cost > avail_funds): # if you dont have enough bread
+            print("Insufficient funds")
+            return False
+        result = vendor.process_order(order)
+        if (result == True):
+            self.wallet -= total_cost # take money out of customer's wallet
+            vendor.earnings += total_cost # add money to vendors earnings
+            return True
+        return False
 
-        pass
  
 class Produce:
 
