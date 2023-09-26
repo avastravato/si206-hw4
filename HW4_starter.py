@@ -33,7 +33,6 @@ class Customer:
            add it to the vendor's earnings and return True.
            Otherwise, return False.
         '''
-        vendor = Vendor() # create instance of vendor class
         total_cost = vendor.calculate_cost() # funx might need parameters as defined below, unsure
         avail_funds = self.wallet
         if (total_cost > avail_funds): # if you dont have enough bread
@@ -42,7 +41,7 @@ class Customer:
         result = vendor.process_order(order)
         if (result == True):
             self.wallet -= total_cost # take money out of customer's wallet
-            vendor.earnings += total_cost # add money to vendors earnings
+            vendor.receive_payment(total_cost) # add money to vendors earnings
             return True
         return False
 
@@ -86,15 +85,14 @@ class Vendor:
         EXTRA CREDIT: It also checks for every customer whose ID is a multiple of 100 
         (cust_id=100, 200, 300 etc) and gives them a 15% discount on every item
         '''
-        produce = Produce()
         # extra credit
-        customer = Customer()
         if (customer.cust_id % 100 == 0):
             produce.cost = produce.cost * .85 # 15% discount
         # end extra credit
         price = produce.cost * quantity
         if (fresh_pick == True):
-            price += 1.5 # might be 1.5 * quantity
+            price += 1.5 * quantity
+        return price
 
     def stock_up(self, produce, quantity):
         ''' 
@@ -102,15 +100,15 @@ class Vendor:
         to the existing value.  Otherwise set the value for the produce
         in the inventory dictionary.
         '''
-        produce = Produce()
+
         if (self.inventory == {}): # check for empty dictionary
             new_entry = {produce.name : quantity}
-            self.inventory.append(new_entry)
+            self.inventory.update(new_entry)
         for items in self.inventory: # for entries in dictionary
             if self.inventory[items] == produce.name: # if match is found
                 self.inventory[produce.name] = quantity
         new_entry = {produce.name : quantity} # if match is not found
-        self.inventory.append(new_entry)
+        self.inventory.update(new_entry)
 
     def process_order(self, order):
         '''
@@ -145,30 +143,31 @@ class TestAllMethods(unittest.TestCase):
         self.rebeccas_home_garden = Vendor(name="Rebecca's Home Garden")
 
     # Check the constructors
-    def test_customer_constructor(self):
+    def test_customer_constructor(self): # pass
         self.assertEqual(self.bob.name, 'Bob')
         self.assertEqual(self.bob.wallet, 10)
 
-    def test_produce_constructor(self):
+    def test_produce_constructor(self): # pass
         self.assertEqual(self.onions.name, 'Onions')
         self.assertAlmostEqual(self.onions.cost, 1.50, 1)
         self.assertEqual(self.bananas.name, 'Bananas')
         self.assertAlmostEqual(self.bananas.cost, 0.75, 0)
 
-    def test_vendor_constructor(self):
+    def test_vendor_constructor(self): # pass
         self.assertEqual(self.clydes_fruits.name, "Clyde's Fruits")
         self.assertEqual(self.clydes_fruits.earnings, 0)
         self.assertEqual(self.rebeccas_home_garden.name,"Rebecca's Home Garden")
         self.assertEqual(self.rebeccas_home_garden.inventory, {})
 
     # Check the reload_wallet method for customer
-    def test_customer_reload_wallet(self):
+    def test_customer_reload_wallet(self): # pass
         self.alice.reload_wallet(10)
         self.assertAlmostEqual(self.alice.wallet, 11.50, 1)
 
     # Check the calculate_cost for vendor
-    def test_vendor_calculate_cost(self):
+    def test_vendor_calculate_cost(self): # fail
         self.assertAlmostEqual(self.clydes_fruits.calculate_cost(self.onions, 10, False, self.alice), 15.00, 2)
+        self.clydes_fruits.calculate_cost(self.onions, 10, False, self.alice) #delete
 
     # Check if discount is applied
         self.assertAlmostEqual(self.rebeccas_home_garden.calculate_cost(self.tomatoes, 3, False, self.alice), 9, 2)
@@ -181,12 +180,12 @@ class TestAllMethods(unittest.TestCase):
 
 
     # Check the receive_payment method for vendor
-    def test_vendor_receive_payment(self):
+    def test_vendor_receive_payment(self): # pass
         self.rebeccas_home_garden.receive_payment(50)
         self.assertAlmostEqual(self.rebeccas_home_garden.earnings, 50.00, 0)
 
     # Check the stock_up method for vendor
-    def test_vendor_stock_up(self):
+    def test_vendor_stock_up(self): # fail
         self.rebeccas_home_garden.stock_up(self.tomatoes, 4)
         self.rebeccas_home_garden.stock_up(self.potatoes, 10)
         self.assertEqual(self.rebeccas_home_garden.inventory, {self.tomatoes: 4, self.potatoes: 10})
@@ -196,7 +195,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(self.clydes_fruits.inventory, {self.onions: 5, self.bananas: 3})
 
     # Check the place_order method for customer
-    def test_customer_place_order(self):
+    def test_customer_place_order(self): # fail
         ted = Customer(name='Ted', cust_id=50)
         franks_fresh_finds = Vendor(name="Frank's Fresh Finds")
 
@@ -212,7 +211,7 @@ class TestAllMethods(unittest.TestCase):
         # Scenario 3: vendor doesn't sell that produce item
         
    
-    def test_customer_place_order_2(self):
+    def test_customer_place_order_2(self): # fail
         ali = Customer(name='Ali', cust_id=200)
         randys_ranch = Vendor(name="Randy's Ranch")
         randys_ranch.stock_up(self.onions, 5)
