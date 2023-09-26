@@ -86,7 +86,15 @@ class Vendor:
         EXTRA CREDIT: It also checks for every customer whose ID is a multiple of 100 
         (cust_id=100, 200, 300 etc) and gives them a 15% discount on every item
         '''
-        pass
+        produce = Produce()
+        # extra credit
+        customer = Customer()
+        if (customer.cust_id % 100 == 0):
+            produce.cost = produce.cost * .85 # 15% discount
+        # end extra credit
+        price = produce.cost * quantity
+        if (fresh_pick == True):
+            price += 1.5 # might be 1.5 * quantity
 
     def stock_up(self, produce, quantity):
         ''' 
