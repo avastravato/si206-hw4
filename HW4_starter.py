@@ -102,7 +102,15 @@ class Vendor:
         to the existing value.  Otherwise set the value for the produce
         in the inventory dictionary.
         '''
-        pass
+        produce = Produce()
+        if (self.inventory == {}): # check for empty dictionary
+            new_entry = {produce.name : quantity}
+            self.inventory.append(new_entry)
+        for items in self.inventory: # for entries in dictionary
+            if self.inventory[items] == produce.name: # if match is found
+                self.inventory[produce.name] = quantity
+        new_entry = {produce.name : quantity} # if match is not found
+        self.inventory.append(new_entry)
 
     def process_order(self, order):
         '''
@@ -110,8 +118,16 @@ class Vendor:
         otherwise it subtracts the produce item from the quantity in the inventory
         and returns True.
         '''
-    
-        pass
+        for items in order:
+            current_item = items
+            for matches in self.inventory:
+                if (current_item == matches):
+                    if (order[current_item] <= self.inventory[matches]):
+                        self.inventory[matches] -= order[current_item]
+                    else:
+                        return False
+        return True
+        
 
 
 class TestAllMethods(unittest.TestCase):
@@ -161,7 +177,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertAlmostEqual(self.rebeccas_home_garden.calculate_cost(self.bananas, 3, True, self.alice), 6.75, 2)
 
     #EXTRA CREDIT: UNCOMMENT THE TEST BELOW: Check if every customer with an ID that is a multiple of a 100 gets the discount
-        # self.assertAlmostEqual(self.rebeccas_home_garden.calculate_cost(self.tomatoes, 3, False, self.bob), 7.65, 2)
+        self.assertAlmostEqual(self.rebeccas_home_garden.calculate_cost(self.tomatoes, 3, False, self.bob), 7.65, 2)
 
 
     # Check the receive_payment method for vendor
